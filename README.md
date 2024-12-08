@@ -1,7 +1,3 @@
-Sure! Here's a professional and engaging README for your project. This will provide a concise overview of the technologies used, the purpose of the project, and how to contribute while keeping the tone professional.
-
----
-
 # **Chat Application - Under Development**
 
 ## **Overview**
