@@ -1,7 +1,8 @@
 import { Server } from "socket.io";
 import socketEvents from "./socketEvents/index.js"; // Import all socket event handlers from the index
 import { verifySocketToken } from "./middlewares/verifyToken.js";
-import userSocketMap from "./utils/userSocketMap.js";
+import {mapUserToSocket, removeUserFromMap} from "./utils/userSocketMap.js";
+
 /**
  * Initialize and configure Socket.IO
  * @param {http.Server} server - The HTTP server instance
@@ -24,9 +25,9 @@ const initializeSocketIO = (server, allowedOrigin) => {
     io.on('connection', (socket) => {
         const userId = socket.user.uid;
 
-        // Map the userId to the socket.id
-        userSocketMap.set(userId, socket.id);
-        console.log(`User ${userId} mapped to socket ID ${socket.id}`);
+        // Map userId to socket.id
+        mapUserToSocket(userId, socket.id);
+        console.log(`User ${userId} connected with socket ID ${socket.id}`);
 
         // Call all event handlers here
         socketEvents(io, socket);
@@ -34,13 +35,7 @@ const initializeSocketIO = (server, allowedOrigin) => {
         // Event for user disconnection
         socket.on('disconnect', () => {
             console.log(`User disconnected: ${socket.id}`);
-            // Clean up userSocketMap here, if needed
-            for (const [key, value] of userSocketMap.entries()) {
-                if (value === socket.id) {
-                    userSocketMap.delete(key);
-                    break;
-                }
-            }
+            removeUserFromMap(socket.id);
         });
     });
 

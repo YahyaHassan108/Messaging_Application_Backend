@@ -2,6 +2,16 @@ import { fetchRoomHistory, fetchRoomsMetadata, getUserRooms } from "../services/
 import { handleSocketEventError } from "../utils/socketEventErrorHandler.js";
 
 export const handleRoomEvents = (io, socket) => {
+    // Join room
+    socket.on('room:join', async (roomId) => {
+        try {
+            socket.join(roomId);
+            io.to(socket.id).emit('room:join', roomId);
+        } catch (error) {
+            handleSocketEventError(io, socket, 'room:join', error, 'ROOM_JOIN_ERROR');
+        }
+    });
+
     // Fetch room list with metadata
     socket.on('room:list:fetch', async (data) => {
         try {
@@ -20,7 +30,7 @@ export const handleRoomEvents = (io, socket) => {
         } catch (error) {
             handleSocketEventError(io, socket, 'room:list:fetch', error, 'ROOM_LIST_FETCH_ERROR');
         }
-    })
+    });
 
     // Fetch room history
     socket.on('room:history:fetch', async (roomId) => {
@@ -34,4 +44,4 @@ export const handleRoomEvents = (io, socket) => {
             handleSocketEventError(io, socket, 'room:history:fetch', error, 'ROOM_HISTORY_FETCH_ERROR');
         }
     });
-}
+};
